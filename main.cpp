@@ -59,6 +59,9 @@ bool operator<(const Date& lhs, const Date& rhs) {
 };
 
 istream& operator>>(istream& stream, Date& date) {
+	/* TODO: maybe it'll be better to change "istream"
+	         to "stringstream" for more convenient Date format checking */
+
 	int new_year, new_month, new_day;
 
 	stream >> new_year;
