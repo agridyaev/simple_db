@@ -5,11 +5,35 @@
 #include <map>
 #include <set>
 #include <iomanip>
+#include <stdexcept>
 
 using namespace std;
 
 class Date {
 public:
+  Date() {
+	  year = 0;
+	  month = 0;
+	  day = 0;
+  };
+
+  Date(int new_year, int new_month, int new_day) {
+	  year = new_year;
+
+	  if (new_month < 1 || new_month > 12) {
+		  string error = "Month value is invalid: " + to_string(new_month);
+		  throw invalid_argument(error);
+	  } else {
+		  month = new_month;
+	  }
+
+	  if (new_day < 1 || new_day > 31) {
+		  string error = "Day value is invalid: " + to_string(new_day);
+		  throw invalid_argument(error);
+	  }
+	  day = new_day;
+  };
+
   int GetYear() const {
 	  return year;
   };
@@ -20,17 +44,6 @@ public:
 	  return day;
   };
 
-  void SetYear(int new_year) {
-	  year = new_year;
-  }
-
-  void SetMonth(int new_month) {
-	  month = new_month;
-  }
-
-  void SetDay(int new_day) {
-	  day = new_day;
-  }
 private:
   int year, month, day;
 };
@@ -47,16 +60,15 @@ bool operator<(const Date& lhs, const Date& rhs) {
 
 istream& operator>>(istream& stream, Date& date) {
 	int new_year, new_month, new_day;
+
 	stream >> new_year;
-	date.SetYear(new_year);
 	stream.ignore(1);
-
 	stream >> new_month;
-	date.SetMonth(new_month);
 	stream.ignore(1);
-
 	stream >> new_day;
-	date.SetDay(new_day);
+
+	date = Date({new_year, new_month, new_day});
+
 	return stream;
 };
 
@@ -107,6 +119,17 @@ private:
   map<Date, set<string>> storage;
 };
 
+bool ReadDate(istringstream& stream, Date& date) {
+	bool result = true;
+	try {
+		stream >> date;
+	} catch (exception& ex) {
+		cout << ex.what();
+		result = false;
+	}
+	return result;
+};
+
 
 int main() {
   Database db;
@@ -124,7 +147,8 @@ int main() {
 			  Date date;
 			  string event;
 
-			  iss >> date;
+			  if (!ReadDate(iss, date))
+				  return 0;
 			  iss >> event;
 
 			  db.AddEvent(date, event);
@@ -132,7 +156,8 @@ int main() {
 			  Date date;
 			  string event;
 
-			  iss >> date;
+			  if (!ReadDate(iss, date))
+				  return 0;
 			  iss >> event;
 			  if (event.size()) {
 				  bool result = db.DeleteEvent(date, event);
@@ -148,7 +173,8 @@ int main() {
 		  } else if (operation_code == "Find") {
 			  Date date;
 
-			  iss >> date;
+			  if (!ReadDate(iss, date))
+				  return 0;
 
 			  set<string> events_founded = db.Find(date);
 			  for (const auto& event : events_founded) {
