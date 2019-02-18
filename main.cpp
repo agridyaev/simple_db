@@ -87,7 +87,13 @@ public:
 	  return events_deleted;
   };
 
-  void Find(const Date& date) const;
+  set<string> Find(const Date& date) const {
+	  set<string> events_founded;
+	  if (storage.count(date) > 0) {
+		  events_founded = storage.at(date);
+	  }
+	  return events_founded;
+  };
 
   void Print() const {
 	  for (const auto& record : storage) {
@@ -122,9 +128,7 @@ int main() {
 			  iss >> event;
 
 			  db.AddEvent(date, event);
-		  }
-
-		  if (operation_code == "Del") {
+		  } else if (operation_code == "Del") {
 			  Date date;
 			  string event;
 
@@ -141,10 +145,19 @@ int main() {
 				  int events_erased = db.DeleteDate(date);
 				  cout << "Deleted " << events_erased << " events" << endl;
 			  }
-		  }
+		  } else if (operation_code == "Find") {
+			  Date date;
 
-		  if (operation_code == "Print") {
+			  iss >> date;
+
+			  set<string> events_founded = db.Find(date);
+			  for (const auto& event : events_founded) {
+				  cout << event << endl;
+			  }
+		  } else if (operation_code == "Print") {
 			  db.Print();
+		  } else {
+			  cout << "Unknown command: " << operation_code << endl;
 		  }
 	  }
   }
