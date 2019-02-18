@@ -81,7 +81,11 @@ public:
 		  return false;
 	  }
   };
-  int  DeleteDate(const Date& date);
+  int  DeleteDate(const Date& date) {
+	  int events_deleted = storage[date].size();
+	  storage.erase(date);
+	  return events_deleted;
+  };
 
   void Find(const Date& date) const;
 
@@ -126,12 +130,16 @@ int main() {
 
 			  iss >> date;
 			  iss >> event;
-
-			  bool result = db.DeleteEvent(date, event);
-			  if (result) {
-				  cout << "Deleted successfully" << endl;
+			  if (event.size()) {
+				  bool result = db.DeleteEvent(date, event);
+				  if (result) {
+					  cout << "Deleted successfully" << endl;
+				  } else {
+					  cout << "Event not found" << endl;
+				  }
 			  } else {
-				  cout << "Event not found" << endl;
+				  int events_erased = db.DeleteDate(date);
+				  cout << "Deleted " << events_erased << " events" << endl;
 			  }
 		  }
 
