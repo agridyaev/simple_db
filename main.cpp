@@ -5,12 +5,28 @@ using namespace std;
 
 class Date {
 public:
-  int GetYear() const;
-  int GetMonth() const;
-  int GetDay() const;
+  int GetYear() const {
+	  return year;
+  };
+  int GetMonth() const {
+	  return month;
+  };
+  int GetDay() const {
+	  return day;
+  };
+private:
+  int year, month, day;
 };
 
-bool operator<(const Date& lhs, const Date& rhs);
+bool operator<(const Date& lhs, const Date& rhs) {
+	if (lhs.year == rhs.year) {
+		if (lhs.month == rhs.month) {
+			return lhs.day < rhs.day;
+		}
+		return lhs.month < rhs.month;
+	}
+	return lhs.year < rhs.year;
+};
 
 class Database {
 public:
