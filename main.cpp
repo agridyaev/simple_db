@@ -184,6 +184,7 @@ int main() {
 			  db.Print();
 		  } else {
 			  cout << "Unknown command: " << operation_code << endl;
+			  return 0;
 		  }
 	  }
   }
