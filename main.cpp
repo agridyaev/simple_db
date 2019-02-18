@@ -1,5 +1,7 @@
 #include <iostream>
+#include <iterator>
 #include <string>
+#include <vector>
 #include <map>
 #include <set>
 #include <iomanip>
@@ -71,7 +73,14 @@ public:
   void AddEvent(const Date& date, const string& event) {
 		  storage[date].insert(event);
   };
-  bool DeleteEvent(const Date& date, const string& event);
+  bool DeleteEvent(const Date& date, const string& event) {
+	  size_t erased = storage[date].erase(event);
+	  if (erased == 1) {
+		  return true;
+	  } else {
+		  return false;
+	  }
+  };
   int  DeleteDate(const Date& date);
 
   void Find(const Date& date) const;
@@ -94,22 +103,39 @@ int main() {
 
   string command;
   while (getline(cin, command)) {
-
-	  cin >> command;
 	  if (!command.length()) {
 		  continue;
 	  } else {
-		  if (command == "Add") {
+		  istringstream iss(command);
+		  string operation_code;
+		  iss >> operation_code;
+
+		  if (operation_code == "Add") {
 			  Date date;
 			  string event;
 
-			  cin >> date;
-			  cin >> event;
+			  iss >> date;
+			  iss >> event;
 
 			  db.AddEvent(date, event);
 		  }
 
-		  if (command == "Print") {
+		  if (operation_code == "Del") {
+			  Date date;
+			  string event;
+
+			  iss >> date;
+			  iss >> event;
+
+			  bool result = db.DeleteEvent(date, event);
+			  if (result) {
+				  cout << "Deleted successfully" << endl;
+			  } else {
+				  cout << "Event not found" << endl;
+			  }
+		  }
+
+		  if (operation_code == "Print") {
 			  db.Print();
 		  }
 	  }
