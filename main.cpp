@@ -1,7 +1,5 @@
 #include <iostream>
-#include <iterator>
 #include <string>
-#include <vector>
 #include <map>
 #include <set>
 #include <iomanip>
@@ -61,15 +59,23 @@ public:
   void AddEvent(const Date& date, const string& event) {
 		  storage[date].insert(event);
   };
+
   bool DeleteEvent(const Date& date, const string& event) {
-	  if (storage[date].erase(event)) {
-		  return true;
+	  if (storage.count(date)) {
+		  if (storage[date].count(event)) {
+		  	  storage[date].erase(event);
+		  	  return true;
+		  }
 	  }
 	  return false;
   };
-  int  DeleteDate(const Date& date) {
-	  int events_deleted = storage[date].size();
-	  storage.erase(date);
+
+  int DeleteDate(const Date& date) {
+	  int events_deleted = 0;
+	  if (storage.count(date)) {
+		  events_deleted = storage[date].size();
+		  storage.erase(date);
+	  }
 	  return events_deleted;
   };
 
@@ -94,7 +100,7 @@ private:
 };
 
 void DateFormatIsValid(const string& date_str) {
-	regex pattern("-?\\+?\\d+--?\\+?\\d+--?\\+?\\d+");
+	regex pattern("-?\\d{1,4}--?\\d{1,2}--?\\d{1,2}");
 
 	if (!regex_match(date_str, pattern)) {
 		throw invalid_argument("Wrong date format: " + date_str);
