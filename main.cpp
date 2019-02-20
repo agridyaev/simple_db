@@ -6,7 +6,6 @@
 #include <set>
 #include <iomanip>
 #include <stdexcept>
-#include <cctype>
 #include <regex>
 
 using namespace std;
@@ -21,18 +20,7 @@ public:
 
   Date(int new_year, int new_month, int new_day) {
 	  year = new_year;
-
-	  if (new_month < 1 || new_month > 12) {
-		  string error = "Month value is invalid: " + to_string(new_month);
-		  throw invalid_argument(error);
-	  } else {
-		  month = new_month;
-	  }
-
-	  if (new_day < 1 || new_day > 31) {
-		  string error = "Day value is invalid: " + to_string(new_day);
-		  throw invalid_argument(error);
-	  }
+	  month = new_month;
 	  day = new_day;
   };
 
@@ -74,12 +62,10 @@ public:
 		  storage[date].insert(event);
   };
   bool DeleteEvent(const Date& date, const string& event) {
-	  size_t erased = storage[date].erase(event);
-	  if (erased == 1) {
+	  if (storage[date].erase(event)) {
 		  return true;
-	  } else {
-		  return false;
 	  }
+	  return false;
   };
   int  DeleteDate(const Date& date) {
 	  int events_deleted = storage[date].size();
@@ -107,29 +93,31 @@ private:
   map<Date, set<string>> storage;
 };
 
-bool DateFormatIsValid(const string& date_str) {
-	bool format_valid = true;
-	string error_text = "Wrong date format: ";
-
+void DateFormatIsValid(const string& date_str) {
 	regex pattern("-?\\+?\\d+--?\\+?\\d+--?\\+?\\d+");
 
 	if (!regex_match(date_str, pattern)) {
-		format_valid = false;
-		cout << error_text << date_str;
+		throw invalid_argument("Wrong date format: " + date_str);
 	}
-
-	return format_valid;
 };
 
 Date ReadDate(const string& date_str) {
+	DateFormatIsValid(date_str);
+
 	int new_year, new_month, new_day;
 	stringstream ss (date_str);
 
 	ss >> new_year;
 	ss.ignore(1);
 	ss >> new_month;
+    if (new_month < 1 || new_month > 12) {
+    	throw invalid_argument("Month value is invalid: " + to_string(new_month));
+    }
 	ss.ignore(1);
 	ss >> new_day;
+	if (new_day < 1 || new_day > 31) {
+		throw invalid_argument("Day value is invalid: " + to_string(new_day));
+	}
 
 	return Date({new_year, new_month, new_day});
 }
@@ -147,14 +135,9 @@ int main() {
 		  string operation_code;
 		  ss >> operation_code;
 
-		  // TODO: Think how to avoid code duplicating on reading and validating date
 		  if (operation_code == "Add") {
 			  string date_str;
 			  ss >> date_str;
-
-			  if (!DateFormatIsValid(date_str)) {
-				  return 0;
-			  }
 
 			  Date date;
 			  try {
@@ -171,9 +154,6 @@ int main() {
 		  } else if (operation_code == "Del") {
 			  string date_str;
 			  ss >> date_str;
-			  if (!DateFormatIsValid(date_str)) {
-				  return 0;
-			  }
 
 			  Date date;
 			  try {
@@ -186,8 +166,7 @@ int main() {
 			  string event;
 			  ss >> event;
 			  if (event.size()) {
-				  bool result = db.DeleteEvent(date, event);
-				  if (result) {
+				  if (db.DeleteEvent(date, event)) {
 					  cout << "Deleted successfully" << endl;
 				  } else {
 					  cout << "Event not found" << endl;
@@ -200,10 +179,6 @@ int main() {
 			  string date_str;
 			  ss >> date_str;
 			  
-			  if (!DateFormatIsValid(date_str)) {
-				  return 0;
-			  }
-
 			  Date date;
 			  try {
 				  date = ReadDate(date_str);
