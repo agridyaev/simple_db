@@ -6,6 +6,8 @@
 #include <set>
 #include <iomanip>
 #include <stdexcept>
+#include <cctype>
+#include <regex>
 
 using namespace std;
 
@@ -58,23 +60,6 @@ bool operator<(const Date& lhs, const Date& rhs) {
 	return lhs.GetYear() < rhs.GetYear();
 };
 
-istream& operator>>(istream& stream, Date& date) {
-	/* TODO: maybe it'll be better to change "istream"
-	         to "stringstream" for more convenient Date format checking */
-
-	int new_year, new_month, new_day;
-
-	stream >> new_year;
-	stream.ignore(1);
-	stream >> new_month;
-	stream.ignore(1);
-	stream >> new_day;
-
-	date = Date({new_year, new_month, new_day});
-
-	return stream;
-};
-
 ostream& operator<<(ostream& stream, const Date& date) {
 	stream << setfill('0');
 	stream << setw(4) << date.GetYear() << '-'
@@ -122,16 +107,32 @@ private:
   map<Date, set<string>> storage;
 };
 
-bool ReadDate(istringstream& stream, Date& date) {
-	bool result = true;
-	try {
-		stream >> date;
-	} catch (exception& ex) {
-		cout << ex.what();
-		result = false;
+bool DateFormatIsValid(const string& date_str) {
+	bool format_valid = true;
+	string error_text = "Wrong date format: ";
+
+	regex pattern("-?\\+?\\d+--?\\+?\\d+--?\\+?\\d+");
+
+	if (!regex_match(date_str, pattern)) {
+		format_valid = false;
+		cout << error_text << date_str;
 	}
-	return result;
+
+	return format_valid;
 };
+
+Date ReadDate(const string& date_str) {
+	int new_year, new_month, new_day;
+	stringstream ss (date_str);
+
+	ss >> new_year;
+	ss.ignore(1);
+	ss >> new_month;
+	ss.ignore(1);
+	ss >> new_day;
+
+	return Date({new_year, new_month, new_day});
+}
 
 
 int main() {
@@ -142,26 +143,48 @@ int main() {
 	  if (!command.length()) {
 		  continue;
 	  } else {
-		  istringstream iss(command);
+		  stringstream ss(command);
 		  string operation_code;
-		  iss >> operation_code;
+		  ss >> operation_code;
 
+		  // TODO: Think how to avoid code duplicating on reading and validating date
 		  if (operation_code == "Add") {
-			  Date date;
-			  string event;
+			  string date_str;
+			  ss >> date_str;
 
-			  if (!ReadDate(iss, date))
+			  if (!DateFormatIsValid(date_str)) {
 				  return 0;
-			  iss >> event;
+			  }
+
+			  Date date;
+			  try {
+				  date = ReadDate(date_str);
+			  } catch (exception& e) {
+				  cout << e.what();
+				  return 0;
+			  }
+
+			  string event;
+			  ss >> event;
 
 			  db.AddEvent(date, event);
 		  } else if (operation_code == "Del") {
-			  Date date;
-			  string event;
-
-			  if (!ReadDate(iss, date))
+			  string date_str;
+			  ss >> date_str;
+			  if (!DateFormatIsValid(date_str)) {
 				  return 0;
-			  iss >> event;
+			  }
+
+			  Date date;
+			  try {
+				  date = ReadDate(date_str);
+			  } catch (exception& e) {
+				  cout << e.what();
+				  return 0;
+			  }
+
+			  string event;
+			  ss >> event;
 			  if (event.size()) {
 				  bool result = db.DeleteEvent(date, event);
 				  if (result) {
@@ -174,10 +197,20 @@ int main() {
 				  cout << "Deleted " << events_erased << " events" << endl;
 			  }
 		  } else if (operation_code == "Find") {
-			  Date date;
-
-			  if (!ReadDate(iss, date))
+			  string date_str;
+			  ss >> date_str;
+			  
+			  if (!DateFormatIsValid(date_str)) {
 				  return 0;
+			  }
+
+			  Date date;
+			  try {
+				  date = ReadDate(date_str);
+			  } catch (exception& e) {
+				  cout << e.what();
+				  return 0;
+			  }
 
 			  set<string> events_founded = db.Find(date);
 			  for (const auto& event : events_founded) {
@@ -186,7 +219,7 @@ int main() {
 		  } else if (operation_code == "Print") {
 			  db.Print();
 		  } else {
-			  cout << "Unknown command: " << operation_code << endl;
+			  cout << "Unknown command: " << operation_code;
 			  return 0;
 		  }
 	  }
