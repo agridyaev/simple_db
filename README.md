@@ -5,5 +5,5 @@ Simple data base for events manipulating
 
 To run Python tests (if you're using venv):
 ```
-venv/bin/python3 -m pytest pytest/ --simple-db-path Debug/simple_db
+venv/bin/python3 -m pytest pytest/test_simple_db.py pytest/conftest.py --simple-db-path ./simple_db
 ```
