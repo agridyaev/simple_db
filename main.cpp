@@ -99,33 +99,34 @@ private:
   map<Date, set<string>> storage;
 };
 
-void DateFormatIsValid(const string& date_str) {
-	regex pattern("-?\\d{1,4}--?\\d{1,2}--?\\d{1,2}");
-
-	if (!regex_match(date_str, pattern)) {
-		throw invalid_argument("Wrong date format: " + date_str);
-	}
-};
-
-Date ReadDate(const string& date_str) {
-	DateFormatIsValid(date_str);
-
-	int new_year, new_month, new_day;
+Date ParseDate(const string& date_str) {
+	int year, month, day;
+	char sep1, sep2;
 	stringstream ss (date_str);
 
-	ss >> new_year;
-	ss.ignore(1);
-	ss >> new_month;
-    if (new_month < 1 || new_month > 12) {
-    	throw invalid_argument("Month value is invalid: " + to_string(new_month));
-    }
-	ss.ignore(1);
-	ss >> new_day;
-	if (new_day < 1 || new_day > 31) {
-		throw invalid_argument("Day value is invalid: " + to_string(new_day));
+	ss >> year >> sep1 >> month >> sep2 >> day;
+
+	if (sep1 != '-' || sep2 != '-') {
+		throw invalid_argument("Wrong date format: " + date_str);
 	}
 
-	return Date({new_year, new_month, new_day});
+	if (ss.fail()) {
+		throw invalid_argument("Wrong date format: " + date_str);
+	}
+
+	if (ss.peek() != EOF) {
+		throw invalid_argument("Wrong date format: " + date_str);
+	}
+
+	if (month < 1 || month > 12) {
+    	throw invalid_argument("Month value is invalid: " + to_string(month));
+    }
+
+	if (day < 1 || day > 31) {
+		throw invalid_argument("Day value is invalid: " + to_string(day));
+	}
+
+	return Date({year, month, day});
 }
 
 
@@ -147,7 +148,7 @@ int main() {
 
 			  Date date;
 			  try {
-				  date = ReadDate(date_str);
+				  date = ParseDate(date_str);
 			  } catch (exception& e) {
 				  cout << e.what();
 				  return 0;
@@ -163,7 +164,7 @@ int main() {
 
 			  Date date;
 			  try {
-				  date = ReadDate(date_str);
+				  date = ParseDate(date_str);
 			  } catch (exception& e) {
 				  cout << e.what();
 				  return 0;
@@ -187,7 +188,7 @@ int main() {
 			  
 			  Date date;
 			  try {
-				  date = ReadDate(date_str);
+				  date = ParseDate(date_str);
 			  } catch (exception& e) {
 				  cout << e.what();
 				  return 0;

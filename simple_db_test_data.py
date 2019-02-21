@@ -10,14 +10,14 @@ DATE_WRONG_FORMAT = [
     pytest.param("Add -12-1 event1", "Wrong date format: -12-1", id="empty_year"),
     pytest.param("Add 0--1 event1", "Wrong date format: 0--1", id="empty_month"),
     pytest.param("Add 0-12- event1", "Wrong date format: 0-12-", id="empty_day"),
+    pytest.param("Add -- event1", "Wrong date format: --", id="empty_year_month_day"),
     pytest.param("Add --0-12-1 event1", "Wrong date format: --0-12-1", id="extra_minus_in_the_beginning"),
     pytest.param("Add 0---12-1 event1", "Wrong date format: 0---12-1", id="extra_minus_in_the_middle"),
     pytest.param("Add 0-12-1- event1", "Wrong date format: 0-12-1-", id="extra_minus_in_the_end"),
     pytest.param("Add asd-fs-df event1", "Wrong date format: asd-fs-df", id="chars_instead_date"),
     pytest.param("Add asdf-12-1 event1", "Wrong date format: asdf-12-1", id="chars_instead_year"),
     pytest.param("Add 0-kwdfh-1 event1", "Wrong date format: 0-kwdfh-1", id="chars_instead_month"),
-    pytest.param("Add 0-12-alskdn event1", "Wrong date format: 0-12-alskdn", id="chars_instead_day"),
-    pytest.param("Add -- event1", "Wrong date format: --", id="empty_year_month_day"),
+    pytest.param("Add 0-12-alskdn event1", "Wrong date format: 0-12-alskdn", id="chars_instead_day")
 ]
 
 DATE_INVALID = [
@@ -32,5 +32,5 @@ DATE_INVALID = [
 ]
 
 ADD_AND_FIND_OPERATION_TEST_DATA = [
-    pytest.param(["Add 0-1-2 event1", "Find 0-1-2"], "event1", id="simple_add_and_find_operation"),
+    pytest.param("Add 0-1-2 event1\nFind 0-1-2", "event1", id="simple_add_and_find_operation"),
 ]

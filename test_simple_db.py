@@ -1,22 +1,20 @@
-from plumbum import local
-from subprocess import Popen, PIPE
+import subprocess
 import pytest
-import pexpect
 
 SIMPLE_DB_BIN = 'Debug/simple_db'
 
-from simple_db_test_data import UNKNOWN_COMMAND, \
+from tests.simple_db_test_data import UNKNOWN_COMMAND, \
                                 DATE_WRONG_FORMAT, \
                                 DATE_INVALID, \
                                 ADD_AND_FIND_OPERATION_TEST_DATA
 
 
 def run_simple_db(input):
-    simple_db_proc = local[SIMPLE_DB_BIN].popen(stdin=PIPE,
-                                                stdout=PIPE,
-                                                encoding='utf8')
-    simple_db_out, simple_db_err = simple_db_proc.communicate(input)
-    return simple_db_out
+    simple_db_proc = subprocess.run(SIMPLE_DB_BIN,
+                                    capture_output=True,
+                                    input=input,
+                                    text=True)
+    return simple_db_proc.stdout
 
 
 @pytest.mark.parametrize("input, expected_out", UNKNOWN_COMMAND)
@@ -63,20 +61,5 @@ def test_date_invalid(input, expected_out):
 
 
 @pytest.mark.parametrize("input, expected_out", ADD_AND_FIND_OPERATION_TEST_DATA)
-@pytest.mark.skip
 def test_add_operation(input, expected_out):
-    p = Popen(SIMPLE_DB_BIN,
-              stdin=PIPE,
-              stdout=PIPE,
-              encoding='utf8')
-    for command in input:
-        p.stdin.write(command)
-    p.stdin.close()
-    # p.wait()
-    # result = p.communicate()
-    # print(result)
-    # simple_db_proc = pexpect.run(SIMPLE_DB_BIN, encoding='utf8', timeout=1)
-#     for command in input:
-#         print('Trying', command, '...')
-#         simple_db_proc.sendline(command)
-#         print(simple_db_proc.before)
+    assert run_simple_db(input).rstrip() == expected_out
