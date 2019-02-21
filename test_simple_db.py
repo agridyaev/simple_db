@@ -4,7 +4,7 @@ import pytest
 from simple_db_test_data import UNKNOWN_COMMAND, \
                                 DATE_WRONG_FORMAT, \
                                 DATE_INVALID, \
-                                ADD_AND_FIND_OPERATION_TEST_DATA
+                                OPERATIONS
 
 
 def run_simple_db(simple_db_path, input):
@@ -58,6 +58,6 @@ def test_date_invalid(request, input, expected_out):
     assert run_simple_db(request.config.getoption('--simple-db-path'), input) == expected_out
 
 
-@pytest.mark.parametrize("input, expected_out", ADD_AND_FIND_OPERATION_TEST_DATA)
-def test_add_operation(request, input, expected_out):
+@pytest.mark.parametrize("input, expected_out", OPERATIONS)
+def test_operations(request, input, expected_out):
     assert run_simple_db(request.config.getoption('--simple-db-path'), input).rstrip() == expected_out
