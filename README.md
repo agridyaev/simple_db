@@ -1,5 +1,5 @@
 # simple_db
-Simple data base for events manipulating
+Simple database for events manipulating
 
 ## Running the tests
 
