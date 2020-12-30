@@ -85,13 +85,13 @@ def test_date_invalid(run_simple_db, command, expected_out):
 
 @pytest.mark.parametrize("command, expected_out", [
     pytest.param("Add 0-12-2 event1", "", id="add"),
-    pytest.param("Add 0-1-31 event1\nFind 0-1-31", "event1", id="add_find"),
-    pytest.param("Add 0-1-2 event1\nDel 0-1-2", "Deleted 1 events", id="add_del_date"),
-    pytest.param("Add 0-1-2 event1\nPrint", "0000-01-02 event1", id="add_print"),
-    pytest.param("Add 0-1-2 event1\nDel 0-1-2 event1", "Deleted successfully", id="add_del_event"),
-    pytest.param("Del 0-1-2", "Deleted 0 events", id="del_non_exis_date"),
-    pytest.param("Del 0-1-2 event1", "Event not found", id="del_non_exis_event"),
-    pytest.param("Add 1-2-3 a\nAdd 1-2-3 b\nDel 1-2-3 c", "Event not found", id="add_2_del_non_exis_event")
+    pytest.param("Add 0-1-31 event1\nFind 0-1-31", "event1\n", id="add_find"),
+    pytest.param("Add 0-1-2 event1\nDel 0-1-2", "Deleted 1 events\n", id="add_del_date"),
+    pytest.param("Add 0-1-2 event1\nPrint", "0000-01-02 event1\n", id="add_print"),
+    pytest.param("Add 0-1-2 event1\nDel 0-1-2 event1", "Deleted successfully\n", id="add_del_event"),
+    pytest.param("Del 0-1-2", "Deleted 0 events\n", id="del_non_exis_date"),
+    pytest.param("Del 0-1-2 event1", "Event not found\n", id="del_non_exis_event"),
+    pytest.param("Add 1-2-3 a\nAdd 1-2-3 b\nDel 1-2-3 c", "Event not found\n", id="add_2_del_non_exis_event")
 ])
 def test_positive(run_simple_db, command, expected_out):
     assert run_simple_db(command) == expected_out
