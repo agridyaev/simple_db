@@ -9,11 +9,13 @@ pipeline {
         }
         stage('test') {
             steps {
-				sh 'PATH=$PATH:$PWD'
-				sh 'python3 -m venv venv'
-				sh '. venv/bin/activate'
-				sh 'pip3 install -r tests/requirements.txt'
-				sh 'pytest -v tests/test_simple_db.py'
+				sh """
+				    PATH=$PATH:$WORKSPACE
+				    python3 -m venv venv
+				    . venv/bin/activate
+				    pip3 install -r tests/requirements.txt
+				    pytest -v tests/test_simple_db.py
+                """
             }
         }
     }
