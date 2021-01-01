@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+
+    stages {
+    	stage('checkout') {
+    		steps {
+    			checkout([$class: 'GitSCM',
+                branches: [[name: '*/master' ]],
+                extensions: scm.extensions,
+                userRemoteConfigs: [[
+                    url: 'git@github.com:agridyaev/simple_db.git',
+                    credentialsId: 'jenkins-github'
+                ]]
+            ])
+    		}
+    	}
+    }
+}
