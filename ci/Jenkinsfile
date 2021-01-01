@@ -17,6 +17,7 @@ pipeline {
         }
         stage('test') {
             steps {
+                sh '. venv/bin/activate'
 				sh 'pytest -v tests/test_simple_db.py'
             }
         }
