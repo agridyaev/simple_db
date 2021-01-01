@@ -1,0 +1,58 @@
+- scm:
+    name: simple-db-git
+    scm:
+      - git:
+          credentials-id: jenkins-github
+          url: git@github.com:agridyaev/simple_db.git
+          branches:
+          - '*/master'
+
+- job:
+    name: 'simple-jjb-db-build'
+    disable_emails: false
+    properties:
+      - build-discarder:
+          days-to-keep: 20
+          num-to-keep: 40
+    scm:
+      - simple-db-git
+    builders:
+        - shell: g++ main.cpp -o simple-db
+    publishers:
+    - archive:
+          artifacts: simple-db
+    triggers:
+      - pollscm:
+          cron: '* * * * *'
+
+- job-template:
+    name: 'simple-jjb-db-test-{test_type}'
+    disable_emails: false
+    build-discarder:
+      days-to-keep: 1
+      num-to-keep: 40
+    scm:
+      - simple-db-git
+    builders:
+      - copyartifact:
+          project: simple-jjb-db-build
+          target: build
+      - shell: |
+          PATH=$PATH:$PWD/build
+          python3 -m venv venv
+          . venv/bin/activate
+          pip3 install -r tests/requirements.txt
+          pytest -v tests/test_simple_db.py::{test_func}
+    triggers:
+      - reverse:
+          jobs: simple-jjb-db-build
+
+- project:
+    name: simple-db-builds
+    jobs:
+      - 'simple-jjb-db-test-{test_type}':
+          test_type: date-invalid
+          test_func: test_date_invalid
+      - 'simple-jjb-db-test-{test_type}':
+          test_type: positive
+          test_func: test_positive
