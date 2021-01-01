@@ -2,17 +2,11 @@ pipeline {
     agent any
 
     stages {
-    	stage('checkout') {
-    		steps {
-    			checkout([$class: 'GitSCM',
-                branches: [[name: '*/master' ]],
-                extensions: scm.extensions,
-                userRemoteConfigs: [[
-                    url: 'git@github.com:agridyaev/simple_db.git',
-                    credentialsId: 'jenkins-github'
-                ]]
-            ])
-    		}
-    	}
+        stage('build') {
+            steps {
+                sh 'g++ main.cpp -o simple-db'
+                archiveArtifacts artifacts: 'simple-db', fingerprint: true
+            }
+        }
     }
 }
