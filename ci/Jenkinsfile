@@ -7,17 +7,12 @@ pipeline {
                 sh 'g++ main.cpp -o simple-db'
             }
         }
-        stage('venv') {
+        stage('test') {
             steps {
 				sh 'PATH=$PATH:$PWD'
 				sh 'python3 -m venv venv'
 				sh '. venv/bin/activate'
 				sh 'pip3 install -r tests/requirements.txt'
-            }
-        }
-        stage('test') {
-            steps {
-                sh '. venv/bin/activate'
 				sh 'pytest -v tests/test_simple_db.py'
             }
         }
