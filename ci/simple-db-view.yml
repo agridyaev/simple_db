@@ -1,0 +1,4 @@
+- view:
+    name: simple-db-jjb
+    view-type: pipeline
+    first-job: simple-db-jjb-build
