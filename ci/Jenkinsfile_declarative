@@ -14,9 +14,21 @@ pipeline {
 				    python3 -m venv venv
 				    . venv/bin/activate
 				    pip3 install -r tests/requirements.txt
-				    pytest -v tests/test_simple_db.py
+				    pytest -v tests/test_simple_db.py --junitxml=report.xml
                 """
             }
+        }
+        stage('report') {
+            steps {
+                junit 'report.xml'
+            }
+        }
+        stage('email') {
+           steps {
+                emailext body: '$DEFAULT_CONTENT',
+                         subject: '$DEFAULT_SUBJECT',
+                         to: 'agridyaev.otus@gmail.com'
+           }
         }
     }
 }
