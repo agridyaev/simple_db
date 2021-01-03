@@ -1,4 +1,14 @@
 node {
+    stage('checkout') {
+        checkout([
+        $class: 'GitSCM',
+        branches: [[name: '*/master']],
+        userRemoteConfigs: [[
+            credentialsId: 'jenkins-github',
+            url: 'git@github.com:agridyaev/simple_db.git'
+            ]]
+        ])
+    }
     stage('build') {
         sh 'g++ main.cpp -o simple-db'
     }
