@@ -24,4 +24,9 @@ node {
     stage('report') {
         junit 'report.xml'
     }
+    stage('email') {
+        emailext body: '$DEFAULT_CONTENT',
+                 subject: '$DEFAULT_SUBJECT',
+                 to: 'agridyaev.otus@gmail.com'
+    }
 }
