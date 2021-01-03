@@ -1,0 +1,14 @@
+node {
+    stage('build') {
+        sh 'g++ main.cpp -o simple-db'
+    }
+    stage('test') {
+        sh """
+            PATH=$PATH:$WORKSPACE
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -r tests/requirements.txt
+            pytest -v tests/test_simple_db.py
+        """
+    }
+}
