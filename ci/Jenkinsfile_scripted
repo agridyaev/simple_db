@@ -21,8 +21,17 @@ node {
             pytest -v tests/test_simple_db.py --junitxml=report.xml
         """
     }
-    stage('report') {
+    stage('report-xml') {
         junit 'report.xml'
+    }
+    stage('report-allure') {
+        allure([
+            includeProperties: false,
+            jdk: '',
+            properties: [],
+            reportBuildPolicy: 'ALWAYS',
+            results: [[path: 'allure-results']]
+        ])
     }
     stage('email') {
         emailext body: '$DEFAULT_CONTENT',
