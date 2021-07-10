@@ -18,9 +18,22 @@ pipeline {
                 """
             }
         }
-        stage('report') {
+        stage('report-xml') {
             steps {
                 junit 'report.xml'
+            }
+        }
+        stage('report-allure') {
+            steps {
+                script {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-results']]
+                    ])
+                }
             }
         }
         stage('email') {
@@ -29,20 +42,6 @@ pipeline {
                          subject: '$DEFAULT_SUBJECT',
                          to: 'agridyaev.otus@gmail.com'
            }
-        }
-    }
-    post {
-        always {
-            script {
-                allure([
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'allure-results']]
-                ])
-            }
-            cleanWs()
         }
     }
 }
