@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('build') {
+            steps {
+                sh 'g++ main.cpp -o simple-db'
+            }
+        }
+        stage('test') {
+            steps {
+				sh """
+				    PATH=$PATH:$WORKSPACE
+				    python3 -m venv venv
+				    . venv/bin/activate
+				    pip3 install -r tests/requirements.txt
+				    pytest -v tests/test_simple_db.py --junitxml=report.xml
+                """
+            }
+        }
+        stage('reports') {
+            parallel {
+                stage('report-xml') {
+                    steps {
+                        junit 'report.xml'
+                    }
+                }
+                stage('report-allure') {
+                    steps {
+                        script {
+                            allure([
+                                includeProperties: false,
+                                jdk: '',
+                                properties: [],
+                                reportBuildPolicy: 'ALWAYS',
+                                results: [[path: 'allure-results']]
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+        stage('email') {
+           steps {
+                emailext body: '$DEFAULT_CONTENT',
+                         subject: '$DEFAULT_SUBJECT',
+                         to: 'agridyaev.otus@gmail.com'
+           }
+        }
+    }
+}
