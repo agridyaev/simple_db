@@ -130,7 +130,7 @@ Date ParseDate(const string& date_str) {
 
 
 int main() {
-  // Test comment
+  // Test comment 2
   Database db;
 
   string command;
